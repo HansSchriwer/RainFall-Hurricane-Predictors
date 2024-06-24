@@ -41,3 +41,7 @@ def predict_hurricane(weather_temp, water_temp, wind_speed):
 
 # Example usage
 print(predict_hurricane(30, 28, 150))  # Adjust the input values as needed
+
+# Weather location file: NOAA API location:
+The API is located at: https://api.weather.gov
+
