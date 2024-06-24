@@ -1,0 +1,43 @@
+# Model 1 - Hurricane prediction
+
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import classification_report, accuracy_score
+
+# Load your dataset
+# Assuming the dataset has columns: 'weather_temp', 'water_temp', 'wind_speed', 'hurricane'
+# 'hurricane' is a binary target variable (1 if hurricane, 0 if not)
+df = pd.read_csv('atlantic_ocean_data.csv')
+
+# Define features and target
+X = df[['weather_temp', 'water_temp', 'wind_speed']]
+y = df['hurricane']
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Initialize and train the logistic regression model
+model = LogisticRegression()
+model.fit(X_train, y_train)
+
+# Predict on the test set
+y_pred = model.predict(X_test)
+
+# Evaluate the model
+accuracy = accuracy_score(y_test, y_pred)
+report = classification_report(y_test, y_pred)
+
+print(f'Accuracy: {accuracy}')
+print('Classification Report:')
+print(report)
+
+# Function to predict hurricane signs
+def predict_hurricane(weather_temp, water_temp, wind_speed):
+    input_data = np.array([[weather_temp, water_temp, wind_speed]])
+    prediction = model.predict(input_data)
+    return 'Hurricane' if prediction[0] == 1 else 'No Hurricane'
+
+# Example usage
+print(predict_hurricane(30, 28, 150))  # Adjust the input values as needed
