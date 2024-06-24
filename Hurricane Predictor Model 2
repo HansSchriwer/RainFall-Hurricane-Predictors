@@ -1,0 +1,66 @@
+# Hurricane Predictor Model Model 2:
+
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline
+from sklearn.metrics import classification_report, accuracy_score
+
+# Load your dataset
+# Assuming the dataset has columns: 'weather_temp', 'water_temp', 'wind_speed', 'hurricane'
+# 'hurricane' is a binary target variable (1 if hurricane, 0 if not)
+df = pd.read_csv('atlantic_ocean_data.csv')
+
+# Define features and target
+X = df[['weather_temp', 'water_temp', 'wind_speed']]
+y = df['hurricane']
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Create a pipeline with a scaler and a random forest classifier
+pipeline = Pipeline([
+    ('scaler', StandardScaler()),
+    ('rf', RandomForestClassifier(random_state=42))
+])
+
+# Define hyperparameters to tune
+param_grid = {
+    'rf__n_estimators': [100, 200, 300],
+    'rf__max_depth': [None, 10, 20, 30],
+    'rf__min_samples_split': [2, 5, 10],
+    'rf__min_samples_leaf': [1, 2, 4]
+}
+
+# Perform GridSearchCV to find the best hyperparameters
+grid_search = GridSearchCV(pipeline, param_grid, cv=5, n_jobs=-1, verbose=2)
+grid_search.fit(X_train, y_train)
+
+# Get the best model
+best_model = grid_search.best_estimator_
+
+# Predict on the test set
+y_pred = best_model.predict(X_test)
+
+# Evaluate the model
+accuracy = accuracy_score(y_test, y_pred)
+report = classification_report(y_test, y_pred)
+
+print(f'Accuracy: {accuracy}')
+print('Classification Report:')
+print(report)
+
+# Function to predict hurricane signs using the best model
+def predict_hurricane(weather_temp, water_temp, wind_speed):
+    input_data = np.array([[weather_temp, water_temp, wind_speed]])
+    input_data_scaled = best_model.named_steps['scaler'].transform(input_data)
+    prediction = best_model.named_steps['rf'].predict(input_data_scaled)
+    return 'Hurricane' if prediction[0] == 1 else 'No Hurricane'
+
+# Example usage
+print(predict_hurricane(30, 28, 150))  # Adjust the input values as needed
+
+# Weather location file: NOAA API location:
+The API is located at: https://api.weather.gov
