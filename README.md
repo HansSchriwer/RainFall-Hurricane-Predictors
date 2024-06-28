@@ -1,2 +1,2 @@
-# RainFallPredictors
-Predict Rain Fall
+# RainFall and Hurricane Predictors
+Predict RainFall and Hurricane
